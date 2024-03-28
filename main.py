@@ -1,15 +1,15 @@
 from pymongo import MongoClient
 import smtplib
 import time
-import os
-from dotenv import load_dotenv
 from pymongo.server_api import ServerApi
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
-stringConnx = os.getenv('CONN_STRING') 
+stringConnx = os.getenv('CONN_STRING')
 client = MongoClient(stringConnx, server_api=ServerApi('1'))
 database = client["Abhedya2k24"]
 
@@ -36,7 +36,7 @@ def gen_email(user):
                     justify-content: center;
                     align-items: center;
                 }}
-        
+
                 .container {{
                     background: #1e3449;
                     border-radius: 10px;
@@ -44,64 +44,65 @@ def gen_email(user):
                     max-width: 800px;
                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
                 }}
-        
+
                 .header {{
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
                     margin-bottom: 20px;
                 }}
-        
+
                 .title {{
                     font-size: 2.5em;
                     text-align: center;
                     color: #d5e4ff;
                     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
                 }}
-        
+
                 .images {{
                     display: flex;
-                    justify-content: center;
+                    justify-content: space-around;
                     align-items: center;
                     width: 100%;
+                    border: 2px solid white;
                 }}
-        
+
                 .image-container {{
                     padding: 5px;
                 }}
-        
+
                 .image {{
-                    width: 80px;
+                    width: 50px;
                 }}
-        
+
                 .content {{
                     line-height: 1.5;
                     margin-bottom: 20px;
                     color: #ffffff !important;
                 }}
-        
+
                 .box {{
                     background: #2d343c;
                     border-radius: 5px;
                     padding: 20px;
                     margin-bottom: 20px;
                 }}
-        
-        
+
+
                 .list {{
                     list-style: none;
                     padding: 0;
                     margin: 0;
                 }}
-        
+
                 .list-item {{
                     margin-bottom: 5px;
                 }}
-        
+
                 a:hover {{
                     background-color: #d5e4ff;
                 }}
-        
+
                 .button {{
                     background: linear-gradient(to right, #3a75ff, #3254db);
                     border: none;
@@ -111,7 +112,7 @@ def gen_email(user):
                     cursor: pointer;
                     transition: all 0.3s ease-in-out;
                 }}
-        
+
                 .button:hover {{
                     transition: all 0.3s ease-in-out;
                     background: linear-gradient(to right, #3254db, #4a90e2);
@@ -125,68 +126,68 @@ def gen_email(user):
             </div>
             <div class="images">
                 <div class="image-container">
-                    <img class="image" src="https://i.imgur.com/XoARgYd.png" alt="ISTE">
+                    <img class="image" src="https://i.imgur.com/XoARgYd.png" alt="Constellation">
                 </div>
                 <div class="image-container">
-                    <img class="image" width="100px" src="https://i.imgur.com/DMlETCl.png" alt="Prodyogiki">
+                    <img class="image" width="100px" src="https://i.imgur.com/DMlETCl.png" alt="Nebula">
                 </div>
             </div>
-            <div class="content" style="color: whitesmoke;">
+            <div class="content">
                 <h1>Hi! {user["username"]}</h1>
                 <p style="color: white;">You registered for Abhedya 2k24. \nTo login and play Abhedya, click the following button.</p>
-                <a href="http://localhost:3000/user/login/{user["loginLink"]}">
-                  <button class="button" style="color: white;">Play Now!</button>
+                <a href="http://abhedya.istenith.com/user/login/{user["loginLink"]}">
+                  <button class="button">Play Now!</button>
                 </a>
                 <br><br>
                 If the button doesn't work, copy and paste the following link in your browser window and hit enter.<br>
-                http://localhost:3000/user/login/{user["loginLink"]}
+                http://abhedya.istenith.com/user/login/{user["loginLink"]}
             </div>
         </div>
       </body>
-      </html>       
+      </html>
     """
-    
+
   recipient = user["email"]
 
   msg = MIMEMultipart('alternative')
   msg['Subject'] = subject
   msg['From'] = sender
   msg['To'] = recipient
-    
+
   htmlPart = MIMEText(html, 'html')
-    
+
   msg.attach(htmlPart)
-  
+
   return msg.as_string()
 
 def main():
 
-    while True: 
-        print("out of sleep")       
+    while True:
+        print("out of sleep")
         users = list(database['users'].find({"emailSent": False}))
         sender = "prodyogiki.iste@gmail.com"
         password = "ivwk fusm tmon tsty"
-                
+
         if len(users) > 0:
-            
+
             print('users found with unsent emails')
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
-                smtp_server.login(sender, password)            
+                smtp_server.login(sender, password)
                 print("logged in server")
-            
+
                 for user in users:
                     email_to_send = gen_email(user)
                     print(user)
 
-                    try:                            
+                    try:
                         smtp_server.sendmail("prody@istenith.com", user["email"], email_to_send)
                         print('mail sent')
                         database['users'].find_one_and_update({"email": user["email"]}, {"$set": {"emailSent": True}})
                     except:
                         print('###ERR couldnt send mail to {}'.format(user["username"]))
-            
+
             # After sending all mails
-            print("cleared queue")                              
+            print('cleared queue')
         else:
             print("No pending emails")
         # wait 30 seconds before sending email again
