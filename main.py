@@ -1,11 +1,15 @@
 from pymongo import MongoClient
 import smtplib
 import time
+import os
+from dotenv import load_dotenv
 from pymongo.server_api import ServerApi
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-stringConnx = "mongodb+srv://mehul:MxHXyfMYQdJ9Dr9@cluster0.9mrxdm8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"  
+load_dotenv()
+
+stringConnx = os.getenv('CONN_STRING') 
 client = MongoClient(stringConnx, server_api=ServerApi('1'))
 database = client["Abhedya2k24"]
 
