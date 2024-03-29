@@ -61,18 +61,13 @@ def gen_email(user):
 
                 .images {{
                     display: flex;
-                    justify-content: space-around;
+                    justify-content: center;
                     align-items: center;
-                    width: 100%;
-                    border: 2px solid white;
-                }}
-
-                .image-container {{
-                    padding: 5px;
+                    width: 100vw;
                 }}
 
                 .image {{
-                    width: 50px;
+                    width: 70px;
                 }}
 
                 .content {{
